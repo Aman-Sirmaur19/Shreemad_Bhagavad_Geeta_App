@@ -27,7 +27,16 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('श्रीमद्भगवद्गीता')),
+      appBar: AppBar(
+          centerTitle: true,
+          title: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset('assets/images/morpankh.png', width: 30),
+              const Text(' श्रीमद्भगवद्गीता '),
+              Image.asset('assets/images/morpankh.png', width: 30),
+            ],
+          )),
       drawer: const MainDrawer(),
       body: FutureBuilder<List<dynamic>>(
         future: chapters,

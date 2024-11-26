@@ -31,30 +31,29 @@ class MainDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Drawer(
         child: Container(
-      decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [
-        Theme.of(context).colorScheme.inversePrimary,
-        Colors.deepPurple,
-      ], begin: Alignment.topRight, end: Alignment.bottomLeft)),
+      decoration: const BoxDecoration(
+          gradient: LinearGradient(
+        colors: [
+          Colors.amber,
+          Colors.blue,
+        ],
+        begin: Alignment.topRight,
+        end: Alignment.bottomLeft,
+      )),
       child: Column(
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(top: mq.height * .05),
+            padding:
+                EdgeInsets.only(top: mq.height * .05, left: mq.width * .025),
             child: Row(
               children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: mq.width * .02),
-                  child: const CircleAvatar(
-                    radius: 35,
-                    backgroundImage: AssetImage('assets/images/avatar.png'),
-                  ),
-                ),
+                Image.asset('assets/images/morpankh.png', width: 50),
                 const Text(
-                  'Hey Buddy!',
+                  ' प्रणिपात 🙏🏼',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
-                    fontSize: 25,
-                    color: Color.fromARGB(255, 95, 48, 237),
+                    fontSize: 30,
+                    color: Colors.black87,
                   ),
                 )
               ],
@@ -196,6 +195,7 @@ class MainDrawer extends StatelessWidget {
           Padding(
             padding: EdgeInsets.only(bottom: mq.height * .02),
             child: const Text('MADE WITH ❤️ IN 🇮🇳',
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
