@@ -1,11 +1,12 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
+import '../secrets.dart';
+
 class ApiService {
   static const String baseUrl =
       'https://bhagavad-gita3.p.rapidapi.com/v2/chapters/';
-  static const String apiKey =
-      'a1af2afb11msh828765a7442df37p1597f4jsnc749fb4c3dfa';
+  static const String apiKey = Secrets.apiKey;
   static const String apiHost = 'bhagavad-gita3.p.rapidapi.com';
 
   Future<List<dynamic>> fetchChapters() async {
