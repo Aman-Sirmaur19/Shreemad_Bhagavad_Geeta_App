@@ -5,14 +5,9 @@ import 'summary_screen.dart';
 import 'all_verses_screen.dart';
 
 class TabScreen extends StatefulWidget {
-  final String chapterNumber;
-  final int numberOfVerses;
+  final dynamic chapter;
 
-  const TabScreen({
-    super.key,
-    required this.chapterNumber,
-    required this.numberOfVerses,
-  });
+  const TabScreen({super.key, required this.chapter});
 
   @override
   State<TabScreen> createState() => _TabScreenState();
@@ -27,13 +22,13 @@ class _TabScreenState extends State<TabScreen> {
     super.initState();
     _pages = [
       {
-        'page': SummaryScreen(chapterNumber: widget.chapterNumber),
+        'page': SummaryScreen(chapter: widget.chapter),
         // 'title': 'Attendance Tracker',
       },
       {
         'page': AllVersesScreen(
-          chapterNumber: widget.chapterNumber,
-          numberOfVerses: widget.numberOfVerses,
+          chapterNumber: widget.chapter['chapter_number'].toString(),
+          numberOfVerses: widget.chapter['verses_count'],
         ),
         // 'title': 'Routine',
       },

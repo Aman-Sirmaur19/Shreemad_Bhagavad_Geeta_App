@@ -52,13 +52,22 @@ class _VerseScreenState extends State<VerseScreen> {
             return Center(child: Text('Error: ${snapshot.error}'));
           } else {
             final item = snapshot.data!;
-            final translation = (item['translations'] as List).firstWhere(
+            final hindiTranslation = (item['translations'] as List).firstWhere(
               (t) => t['author_name'] == 'Swami Tejomayananda',
-              orElse: () => null, // Handle the case where no match is found
+              orElse: () => null,
             );
-            final commentary = (item['commentaries'] as List).firstWhere(
+            final englishTranslation =
+                (item['translations'] as List).firstWhere(
+              (t) => t['author_name'] == 'Shri Purohit Swami',
+              orElse: () => null,
+            );
+            final hindiCommentary = (item['commentaries'] as List).firstWhere(
               (t) => t['author_name'] == 'Swami Chinmayananda',
-              orElse: () => null, // Handle the case where no match is found
+              orElse: () => null,
+            );
+            final englishCommentary = (item['commentaries'] as List).firstWhere(
+              (t) => t['author_name'] == 'Swami Sivananda',
+              orElse: () => null,
             );
             return ListView(
               padding: const EdgeInsets.all(10),
@@ -74,11 +83,12 @@ class _VerseScreenState extends State<VerseScreen> {
                 const Divider(),
                 const Text('Translation:',
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
                     )),
+                const SizedBox(height: 5),
                 Text(
-                  utf8.decode(translation['description'].runes.toList()).trim(),
+                  '${utf8.decode(hindiTranslation['description'].runes.toList()).trim()}\n\n${utf8.decode(englishTranslation['description'].runes.toList()).trim()}',
                   style: const TextStyle(
                     color: Colors.black54,
                     fontSize: 17,
@@ -88,11 +98,14 @@ class _VerseScreenState extends State<VerseScreen> {
                 const Divider(),
                 const Text('Description:',
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
                     )),
+                const SizedBox(height: 5),
                 Text(
-                  utf8.decode(commentary['description'].runes.toList()).trim(),
+                  utf8
+                      .decode(hindiCommentary['description'].runes.toList())
+                      .trim(),
                   style: const TextStyle(
                     color: Colors.black54,
                     fontSize: 17,

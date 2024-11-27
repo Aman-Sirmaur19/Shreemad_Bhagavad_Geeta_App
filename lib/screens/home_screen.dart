@@ -55,11 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     onTap: () => Navigator.push(
                         context,
                         CupertinoPageRoute(
-                            builder: (_) => TabScreen(
-                                  chapterNumber:
-                                      chapter['chapter_number'].toString(),
-                                  numberOfVerses: chapter['verses_count'],
-                                ))),
+                            builder: (_) => TabScreen(chapter: chapter))),
                     leading: CircleAvatar(
                         child: Text('${chapter['chapter_number']}')),
                     title: Text(

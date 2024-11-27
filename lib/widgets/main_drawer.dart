@@ -91,10 +91,10 @@ class MainDrawer extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(mq.width * .15),
+                          borderRadius: BorderRadius.circular(50),
                           child: Image.asset(
                             'assets/images/avatar.png',
-                            width: mq.width * .3,
+                            width: 100,
                           ),
                         ),
                         const SizedBox(height: 10),
