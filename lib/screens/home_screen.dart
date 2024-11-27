@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 import '../services/api_service.dart';
 import '../widgets/main_drawer.dart';
@@ -17,11 +18,17 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final ApiService apiService = ApiService();
   late Future<List<dynamic>> chapters;
+  final FlutterTts textToSpeech = FlutterTts();
 
   @override
   void initState() {
     super.initState();
     chapters = apiService.fetchChapters();
+  }
+
+  void _speak(String text) async {
+    await textToSpeech.setLanguage('hi-IN');
+    await textToSpeech.speak(text);
   }
 
   @override
@@ -50,6 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 final chapter = snapshot.data![index];
+                final chapterName = utf8.decode(chapter['name'].runes.toList());
                 return Card(
                   child: ListTile(
                     onTap: () => Navigator.push(
@@ -59,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     leading: CircleAvatar(
                         child: Text('${chapter['chapter_number']}')),
                     title: Text(
-                      utf8.decode(chapter['name'].runes.toList()),
+                      chapterName,
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -82,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     trailing: IconButton(
-                      onPressed: () {},
+                      onPressed: () => _speak(chapterName),
                       tooltip: 'Pronounce',
                       icon: const Icon(CupertinoIcons.speaker_2),
                     ),
