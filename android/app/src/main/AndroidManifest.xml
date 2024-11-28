@@ -2,6 +2,10 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <queries>
         <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
             <action android:name="android.intent.action.TTS_SERVICE" />
         </intent>
     </queries>
@@ -35,5 +39,8 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-9389901804535827~4361731117" />
     </application>
 </manifest>

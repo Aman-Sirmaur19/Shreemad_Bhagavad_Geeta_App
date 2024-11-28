@@ -1,15 +1,94 @@
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import '../widgets/main_drawer.dart';
 import 'verse_screen.dart';
 
-class AllVersesScreen extends StatelessWidget {
+class AllVersesScreen extends StatefulWidget {
   final String chapterNumber;
   final int numberOfVerses;
 
   const AllVersesScreen(
       {super.key, required this.chapterNumber, required this.numberOfVerses});
+
+  @override
+  State<AllVersesScreen> createState() => _AllVersesScreenState();
+}
+
+class _AllVersesScreenState extends State<AllVersesScreen> {
+  bool isBannerLoaded = false;
+  late BannerAd bannerAd;
+  bool isInterstitialLoaded = false;
+  late InterstitialAd interstitialAd;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeBannerAd();
+    _initializeInterstitialAd();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    bannerAd.dispose();
+    interstitialAd.dispose();
+  }
+
+  void _initializeBannerAd() async {
+    bannerAd = BannerAd(
+      size: AdSize.banner,
+      adUnitId: 'ca-app-pub-9389901804535827/5411361970',
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            isBannerLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+          isBannerLoaded = false;
+          log(error.message);
+        },
+      ),
+      request: const AdRequest(),
+    );
+    bannerAd.load();
+  }
+
+  void _initializeInterstitialAd() async {
+    InterstitialAd.load(
+      adUnitId: 'ca-app-pub-9389901804535827/8281628976',
+      request: const AdRequest(),
+      adLoadCallback: InterstitialAdLoadCallback(
+        onAdLoaded: (ad) {
+          interstitialAd = ad;
+          setState(() {
+            isInterstitialLoaded = true;
+          });
+          interstitialAd.fullScreenContentCallback = FullScreenContentCallback(
+            onAdDismissedFullScreenContent: (ad) {
+              ad.dispose();
+              _initializeInterstitialAd();
+            },
+            onAdFailedToShowFullScreenContent: (ad, error) {
+              log('Ad failed to show: ${error.message}');
+              ad.dispose();
+              _initializeInterstitialAd();
+            },
+          );
+        },
+        onAdFailedToLoad: (error) {
+          log('Failed to load interstitial ad: ${error.message}');
+          setState(() {
+            isInterstitialLoaded = false;
+          });
+        },
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,21 +101,26 @@ class AllVersesScreen extends StatelessWidget {
         ),
         title: const Text('Verses'),
       ),
-      drawer: const MainDrawer(),
+      bottomNavigationBar: isBannerLoaded
+          ? SizedBox(height: 50, child: AdWidget(ad: bannerAd))
+          : null,
       body: ListView.builder(
-        itemCount: numberOfVerses,
+        itemCount: widget.numberOfVerses,
         itemBuilder: (context, index) {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5),
             child: Card(
               child: ListTile(
-                  onTap: () => Navigator.push(
-                      context,
-                      CupertinoPageRoute(
-                          builder: (_) => VerseScreen(
-                                chapterNumber: chapterNumber,
-                                verseNumber: (index + 1).toString(),
-                              ))),
+                  onTap: () {
+                    if (isInterstitialLoaded) interstitialAd.show();
+                    Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                            builder: (_) => VerseScreen(
+                                  chapterNumber: widget.chapterNumber,
+                                  verseNumber: (index + 1).toString(),
+                                )));
+                  },
                   title: Text(
                     'Verse ${index + 1}',
                   )),

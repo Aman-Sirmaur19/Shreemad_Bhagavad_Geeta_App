@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../services/api_service.dart';
 
@@ -22,14 +24,44 @@ class VerseScreen extends StatefulWidget {
 class _VerseScreenState extends State<VerseScreen> {
   final ApiService apiService = ApiService();
   late Future<Map<String, dynamic>> verse;
+  bool isBannerLoaded = false;
+  late BannerAd bannerAd;
 
   @override
   void initState() {
     super.initState();
+    _initializeBannerAd();
     verse = apiService.fetchParticularVerse(
       widget.chapterNumber,
       widget.verseNumber,
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    bannerAd.dispose();
+  }
+
+  void _initializeBannerAd() async {
+    bannerAd = BannerAd(
+      size: AdSize.banner,
+      adUnitId: 'ca-app-pub-9389901804535827/5411361970',
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            isBannerLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          ad.dispose();
+          isBannerLoaded = false;
+          log(error.message);
+        },
+      ),
+      request: const AdRequest(),
+    );
+    bannerAd.load();
   }
 
   @override
@@ -43,6 +75,9 @@ class _VerseScreenState extends State<VerseScreen> {
         ),
         title: Text('Verse ${widget.verseNumber}'),
       ),
+      bottomNavigationBar: isBannerLoaded
+          ? SizedBox(height: 50, child: AdWidget(ad: bannerAd))
+          : null,
       body: FutureBuilder<Map<String, dynamic>>(
         future: verse,
         builder: (context, snapshot) {

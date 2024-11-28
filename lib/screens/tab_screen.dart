@@ -59,6 +59,7 @@ class _TabScreenState extends State<TabScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.list_bullet_indent),
+            backgroundColor: Colors.black87,
             label: 'Verses',
           ),
         ],
