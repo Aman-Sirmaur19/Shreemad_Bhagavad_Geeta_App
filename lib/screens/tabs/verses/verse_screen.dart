@@ -1,11 +1,16 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import '../services/api_service.dart';
+import '../../../controllers/bookmarks_controller.dart';
+import '../../../services/api_service.dart';
+import '../../../widgets/internet_connectivity_button.dart';
 
 class VerseScreen extends StatefulWidget {
   final String chapterNumber;
@@ -23,25 +28,10 @@ class VerseScreen extends StatefulWidget {
 
 class _VerseScreenState extends State<VerseScreen> {
   final ApiService apiService = ApiService();
+  final BookmarksController _bookmarksController = Get.find();
   late Future<Map<String, dynamic>> verse;
   bool isBannerLoaded = false;
   late BannerAd bannerAd;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeBannerAd();
-    verse = apiService.fetchParticularVerse(
-      widget.chapterNumber,
-      widget.verseNumber,
-    );
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    bannerAd.dispose();
-  }
 
   void _initializeBannerAd() async {
     bannerAd = BannerAd(
@@ -64,6 +54,53 @@ class _VerseScreenState extends State<VerseScreen> {
     bannerAd.load();
   }
 
+  void _toggleBookmark(String chapterNumber, String verseNumber) {
+    var box = Hive.box<Map>('verseBookmarks');
+    var bookmarks = box.get(chapterNumber);
+
+    if (bookmarks == null) {
+      bookmarks = SplayTreeMap<String, String>();
+    } else {
+      bookmarks = SplayTreeMap<String, String>.from(bookmarks);
+    }
+
+    if (bookmarks.containsKey(verseNumber)) {
+      bookmarks.remove(verseNumber);
+      if (bookmarks.isEmpty) {
+        box.delete(chapterNumber);
+      } else {
+        box.put(chapterNumber, bookmarks);
+      }
+    } else {
+      bookmarks[verseNumber] = verseNumber;
+      box.put(chapterNumber, bookmarks);
+    }
+
+    _bookmarksController.loadVersesBookmark();
+  }
+
+  bool _isBookmarked(String chapterNumber, String verseNumber) {
+    var box = Hive.box<Map>('verseBookmarks');
+    var bookmarks = box.get(chapterNumber, defaultValue: {});
+    return bookmarks!.containsKey(verseNumber);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeBannerAd();
+    verse = apiService.fetchParticularVerse(
+      widget.chapterNumber,
+      widget.verseNumber,
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    bannerAd.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -74,6 +111,18 @@ class _VerseScreenState extends State<VerseScreen> {
           icon: const Icon(CupertinoIcons.chevron_back),
         ),
         title: Text('Verse ${widget.verseNumber}'),
+        actions: [
+          IconButton(
+            onPressed: () => setState(() =>
+                _toggleBookmark(widget.chapterNumber, widget.verseNumber)),
+            tooltip: 'Bookmark',
+            icon: Icon(
+              _isBookmarked(widget.chapterNumber, widget.verseNumber)
+                  ? CupertinoIcons.bookmark_fill
+                  : CupertinoIcons.bookmark,
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: isBannerLoaded
           ? SizedBox(height: 50, child: AdWidget(ad: bannerAd))
@@ -84,7 +133,13 @@ class _VerseScreenState extends State<VerseScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return InternetConnectivityButton(
+                onPressed: () => setState(() {
+                      verse = apiService.fetchParticularVerse(
+                        widget.chapterNumber,
+                        widget.verseNumber,
+                      );
+                    }));
           } else {
             final item = snapshot.data!;
             final hindiTranslation = (item['translations'] as List).firstWhere(
@@ -109,9 +164,10 @@ class _VerseScreenState extends State<VerseScreen> {
               children: [
                 Text(
                   utf8.decode(item['text'].runes.toList()).trim(),
-                  style: const TextStyle(
+                  style: TextStyle(
+                    height: 0.9,
                     fontSize: 18,
-                    color: Colors.blueGrey,
+                    color: Colors.orange.shade600,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -125,7 +181,7 @@ class _VerseScreenState extends State<VerseScreen> {
                 Text(
                   '${utf8.decode(hindiTranslation['description'].runes.toList()).trim()}\n\n${utf8.decode(englishTranslation['description'].runes.toList()).trim()}',
                   style: const TextStyle(
-                    color: Colors.black54,
+                    color: Colors.blueGrey,
                     fontSize: 17,
                     fontWeight: FontWeight.bold,
                   ),

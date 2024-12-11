@@ -1,19 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'summary_screen.dart';
-import 'all_verses_screen.dart';
+import 'chapters_bookmark_screen.dart';
+import 'verses_bookmark_screen.dart';
 
-class TabScreen extends StatefulWidget {
-  final dynamic chapter;
-
-  const TabScreen({super.key, required this.chapter});
+class BookmarksTabScreen extends StatefulWidget {
+  const BookmarksTabScreen({super.key});
 
   @override
-  State<TabScreen> createState() => _TabScreenState();
+  State<BookmarksTabScreen> createState() => _BookmarksTabScreenState();
 }
 
-class _TabScreenState extends State<TabScreen> {
+class _BookmarksTabScreenState extends State<BookmarksTabScreen> {
   late List<Map<String, dynamic>> _pages;
   int _selectedPageIndex = 0;
 
@@ -22,15 +20,10 @@ class _TabScreenState extends State<TabScreen> {
     super.initState();
     _pages = [
       {
-        'page': SummaryScreen(chapter: widget.chapter),
-        // 'title': 'Attendance Tracker',
+        'page': const ChaptersBookmarkScreen(),
       },
       {
-        'page': AllVersesScreen(
-          chapterNumber: widget.chapter['chapter_number'].toString(),
-          numberOfVerses: widget.chapter['verses_count'],
-        ),
-        // 'title': 'Routine',
+        'page': const VersesBookmarkScreen(),
       },
     ];
   }
@@ -53,12 +46,12 @@ class _TabScreenState extends State<TabScreen> {
         type: BottomNavigationBarType.shifting,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.pencil_outline),
+            icon: Icon(CupertinoIcons.list_bullet_indent),
             backgroundColor: Colors.black87,
-            label: 'Summary',
+            label: 'Chapters',
           ),
           BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.list_bullet_indent),
+            icon: Icon(Icons.menu_book_rounded),
             backgroundColor: Colors.black87,
             label: 'Verses',
           ),

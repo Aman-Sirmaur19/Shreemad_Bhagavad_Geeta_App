@@ -110,6 +110,7 @@ class _AllVersesScreenState extends State<AllVersesScreen> {
           return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 5),
             child: Card(
+              color: Colors.brown,
               child: ListTile(
                   onTap: () {
                     if (isInterstitialLoaded) interstitialAd.show();
@@ -123,6 +124,11 @@ class _AllVersesScreenState extends State<AllVersesScreen> {
                   },
                   title: Text(
                     'Verse ${index + 1}',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.amber.shade200,
+                    ),
                   )),
             ),
           );

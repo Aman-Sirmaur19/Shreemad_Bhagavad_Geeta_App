@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../main.dart';
+import '../screens/bookmarks/bookmarks_tab_screen.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key});
@@ -35,7 +36,7 @@ class MainDrawer extends StatelessWidget {
           gradient: LinearGradient(
         colors: [
           Colors.amber,
-          Colors.blue,
+          Colors.orange,
         ],
         begin: Alignment.topRight,
         end: Alignment.bottomLeft,
@@ -48,30 +49,33 @@ class MainDrawer extends StatelessWidget {
             child: Row(
               children: [
                 Image.asset('assets/images/morpankh.png', width: 50),
-                const Text(
+                Text(
                   ' प्रणिपात 🙏🏼',
                   style: TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 30,
-                    color: Colors.black87,
+                    color: Colors.blue.shade700,
                   ),
                 )
               ],
             ),
           ),
-          SizedBox(height: mq.height * .03),
+          const Divider(color: Colors.black12),
+          SizedBox(height: mq.height * .01),
+          // buildListTile(
+          //   'Settings',
+          //   CupertinoIcons.gear,
+          //   () => Navigator.push(context,
+          //       CupertinoPageRoute(builder: (_) => const SettingsScreen())),
+          // ),
           buildListTile(
-            'Settings',
-            CupertinoIcons.settings,
-            () {},
-          ),
-          buildListTile(
-            'Bookmark',
+            'Bookmarks',
             CupertinoIcons.bookmark,
-            () {},
+            () => Navigator.push(context,
+                CupertinoPageRoute(builder: (_) => const BookmarksTabScreen())),
           ),
           buildListTile(
-            'More Apps!',
+            'More Apps',
             CupertinoIcons.app_badge,
             () async {
               const url =

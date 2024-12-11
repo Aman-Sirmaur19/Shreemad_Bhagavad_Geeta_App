@@ -1,15 +1,19 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:math' as m;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:get/get.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:in_app_update/in_app_update.dart';
 
+import '../controllers/bookmarks_controller.dart';
 import '../services/api_service.dart';
+import '../widgets/internet_connectivity_button.dart';
 import '../widgets/main_drawer.dart';
-import 'tab_screen.dart';
+import 'tabs/tab_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -133,7 +137,11 @@ class _HomeScreenState extends State<HomeScreen> {
             children: [
               Image.asset('assets/images/morpankh.png', width: 30),
               const Text(' श्रीमद्भगवद्गीता '),
-              Image.asset('assets/images/morpankh.png', width: 30),
+              Transform(
+                alignment: Alignment.center,
+                transform: Matrix4.rotationY(m.pi),
+                child: Image.asset('assets/images/morpankh.png', width: 30),
+              ),
             ],
           )),
       drawer: const MainDrawer(),
@@ -146,14 +154,20 @@ class _HomeScreenState extends State<HomeScreen> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return InternetConnectivityButton(
+                onPressed: () => setState(() {
+                      chapters = apiService.fetchChapters();
+                    }));
           } else {
+            final BookmarksController bookmarksController = Get.find();
+            bookmarksController.setChapters(snapshot.data!);
             return ListView.builder(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 final chapter = snapshot.data![index];
                 final chapterName = utf8.decode(chapter['name'].runes.toList());
                 return Card(
+                  color: Colors.brown,
                   child: ListTile(
                     onTap: () {
                       if (isInterstitialLoaded) interstitialAd.show();
@@ -166,9 +180,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         child: Text('${chapter['chapter_number']}')),
                     title: Text(
                       chapterName,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
+                        color: Colors.orange.shade400,
                       ),
                     ),
                     subtitle: Column(
@@ -176,13 +191,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Text(
                           chapter['name_translated'],
-                          style: const TextStyle(fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: Colors.amber.shade200,
+                          ),
                         ),
                         Text(
                           'Verses: ${chapter['verses_count']}',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.blueGrey,
+                            color: Colors.blueGrey.shade100,
                           ),
                         ),
                       ],
@@ -190,6 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     trailing: IconButton(
                       onPressed: () => _speak(chapterName),
                       tooltip: 'Pronounce',
+                      color: Colors.amber.shade200,
                       icon: const Icon(CupertinoIcons.speaker_2),
                     ),
                   ),

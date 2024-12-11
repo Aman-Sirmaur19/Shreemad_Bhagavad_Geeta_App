@@ -3,7 +3,11 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:hive/hive.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+
+import '../../controllers/bookmarks_controller.dart';
 
 class SummaryScreen extends StatefulWidget {
   final dynamic chapter;
@@ -15,20 +19,9 @@ class SummaryScreen extends StatefulWidget {
 }
 
 class _SummaryScreenState extends State<SummaryScreen> {
+  final BookmarksController _bookmarksController = Get.find();
   bool isBannerLoaded = false;
   late BannerAd bannerAd;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeBannerAd();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    bannerAd.dispose();
-  }
 
   void _initializeBannerAd() async {
     bannerAd = BannerAd(
@@ -51,6 +44,33 @@ class _SummaryScreenState extends State<SummaryScreen> {
     bannerAd.load();
   }
 
+  void _toggleBookmark(String chapterNumber) {
+    var box = Hive.box<String>('summaryBookmarks');
+    if (box.containsKey(chapterNumber)) {
+      box.delete(chapterNumber);
+    } else {
+      box.put(chapterNumber, chapterNumber);
+    }
+    _bookmarksController.loadChaptersBookmark();
+  }
+
+  bool _isBookmarked(String chapterNumber) {
+    var box = Hive.box<String>('summaryBookmarks');
+    return box.containsKey(chapterNumber);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeBannerAd();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    bannerAd.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,6 +81,18 @@ class _SummaryScreenState extends State<SummaryScreen> {
           icon: const Icon(CupertinoIcons.chevron_back),
         ),
         title: Text('Chapter ${widget.chapter['chapter_number']}'),
+        actions: [
+          IconButton(
+            onPressed: () => setState(() =>
+                _toggleBookmark(widget.chapter['chapter_number'].toString())),
+            tooltip: 'Bookmark',
+            icon: Icon(
+              _isBookmarked(widget.chapter['chapter_number'].toString())
+                  ? CupertinoIcons.bookmark_fill
+                  : CupertinoIcons.bookmark,
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: isBannerLoaded
           ? SizedBox(height: 50, child: AdWidget(ad: bannerAd))
@@ -70,27 +102,38 @@ class _SummaryScreenState extends State<SummaryScreen> {
         children: [
           Text(
             utf8.decode(widget.chapter['name'].runes.toList()),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
-              color: Colors.blueGrey,
+              color: Colors.orange.shade600,
               fontWeight: FontWeight.bold,
             ),
           ),
           Text(
             widget.chapter['name_translated'],
             style: const TextStyle(
+              color: Colors.blueGrey,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
           ),
           const Divider(),
-          Text(
-            'Verses: ${widget.chapter['verses_count'].toString()}',
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.blueGrey,
-              fontWeight: FontWeight.bold,
-            ),
+          RichText(
+            text: TextSpan(
+                text: 'Verses: ',
+                style: const TextStyle(
+                  fontSize: 16,
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+                children: [
+                  TextSpan(
+                      text: widget.chapter['verses_count'].toString(),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black54,
+                        fontWeight: FontWeight.bold,
+                      ))
+                ]),
           ),
           const Divider(),
           const Text(
@@ -105,7 +148,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
             widget.chapter['name_meaning'],
             style: const TextStyle(
               fontSize: 17,
-              color: Colors.black54,
+              color: Colors.blueGrey,
               fontWeight: FontWeight.bold,
             ),
           ),

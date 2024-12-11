@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import 'controllers/bookmarks_controller.dart';
 import 'screens/home_screen.dart';
 
 late Size mq;
 
-void main() {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   _initializeMobileAds();
+  await Hive.initFlutter();
+  await Hive.openBox<String>('summaryBookmarks');
+  await Hive.openBox<Map>('verseBookmarks');
+  Get.put(BookmarksController());
   runApp(const MyApp());
 }
 
@@ -33,7 +40,8 @@ class MyApp extends StatelessWidget {
           ),
           backgroundColor: Colors.amber,
         ),
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.amber),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.amber, background: Colors.amber.shade100),
         useMaterial3: true,
       ),
       home: const HomeScreen(),
