@@ -1,4 +1,4 @@
-package com.sirmaur.shreemad_bhagvad_geeta
+package com.sirmaur.shreemad_bhagavad_geeta
 
 import io.flutter.embedding.android.FlutterActivity
 

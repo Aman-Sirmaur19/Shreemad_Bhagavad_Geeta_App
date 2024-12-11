@@ -1,4 +1,4 @@
-# shreemad_bhagvad_geeta
+# shreemad_bhagavad_geeta
 
 A new Flutter project.
 

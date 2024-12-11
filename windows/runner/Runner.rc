@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.sirmaur" "\0"
-            VALUE "FileDescription", "shreemad_bhagvad_geeta" "\0"
+            VALUE "FileDescription", "shreemad_bhagavad_geeta" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "shreemad_bhagvad_geeta" "\0"
+            VALUE "InternalName", "shreemad_bhagavad_geeta" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 com.sirmaur. All rights reserved." "\0"
-            VALUE "OriginalFilename", "shreemad_bhagvad_geeta.exe" "\0"
-            VALUE "ProductName", "shreemad_bhagvad_geeta" "\0"
+            VALUE "OriginalFilename", "shreemad_bhagavad_geeta.exe" "\0"
+            VALUE "ProductName", "shreemad_bhagavad_geeta" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

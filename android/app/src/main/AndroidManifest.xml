@@ -10,7 +10,7 @@
         </intent>
     </queries>
     <application
-        android:label="Shreemad Bhagvad Geeta"
+        android:label="Shreemad Bhagavad Geeta"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
