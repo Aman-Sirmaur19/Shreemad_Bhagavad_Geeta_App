@@ -10,14 +10,14 @@ import '../../widgets/empty_bookmarks.dart';
 import '../../providers/bookmarks_provider.dart';
 import '../tabs/tab_screen.dart';
 
-class ChaptersBookmarkScreen extends StatefulWidget {
-  const ChaptersBookmarkScreen({super.key});
+class BookmarkedChaptersScreen extends StatefulWidget {
+  const BookmarkedChaptersScreen({super.key});
 
   @override
-  State<ChaptersBookmarkScreen> createState() => _ChaptersBookmarkScreenState();
+  State<BookmarkedChaptersScreen> createState() => _BookmarkedChaptersScreenState();
 }
 
-class _ChaptersBookmarkScreenState extends State<ChaptersBookmarkScreen> {
+class _BookmarkedChaptersScreenState extends State<BookmarkedChaptersScreen> {
   bool isBannerLoaded = false;
   late BannerAd bannerAd;
   bool isInterstitialLoaded = false;
@@ -106,7 +106,7 @@ class _ChaptersBookmarkScreenState extends State<ChaptersBookmarkScreen> {
           tooltip: 'Back',
           icon: const Icon(CupertinoIcons.chevron_back),
         ),
-        title: const Text('Chapters Bookmarks'),
+        title: const Text('Bookmarked Chapters'),
       ),
       bottomNavigationBar: isBannerLoaded
           ? SizedBox(height: 50, child: AdWidget(ad: bannerAd))

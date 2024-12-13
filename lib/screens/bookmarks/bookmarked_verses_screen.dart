@@ -11,14 +11,14 @@ import '../../widgets/empty_bookmarks.dart';
 import '../../providers/bookmarks_provider.dart';
 import '../tabs/verses/verse_screen.dart';
 
-class VersesBookmarkScreen extends StatefulWidget {
-  const VersesBookmarkScreen({super.key});
+class BookmarkedVersesScreen extends StatefulWidget {
+  const BookmarkedVersesScreen({super.key});
 
   @override
-  State<VersesBookmarkScreen> createState() => _VersesBookmarkScreenState();
+  State<BookmarkedVersesScreen> createState() => _BookmarkedVersesScreenState();
 }
 
-class _VersesBookmarkScreenState extends State<VersesBookmarkScreen> {
+class _BookmarkedVersesScreenState extends State<BookmarkedVersesScreen> {
   bool isBannerLoaded = false;
   late BannerAd bannerAd;
   bool isInterstitialLoaded = false;
@@ -102,7 +102,7 @@ class _VersesBookmarkScreenState extends State<VersesBookmarkScreen> {
           tooltip: 'Back',
           icon: const Icon(CupertinoIcons.chevron_back),
         ),
-        title: const Text('Verses Bookmarks'),
+        title: const Text('Bookmarked Verses'),
       ),
       bottomNavigationBar: isBannerLoaded
           ? SizedBox(height: 50, child: AdWidget(ad: bannerAd))

@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'chapters_bookmark_screen.dart';
-import 'verses_bookmark_screen.dart';
+import 'bookmarked_chapters_screen.dart';
+import 'bookmarked_verses_screen.dart';
 
 class BookmarksTabScreen extends StatefulWidget {
   const BookmarksTabScreen({super.key});
@@ -20,10 +20,10 @@ class _BookmarksTabScreenState extends State<BookmarksTabScreen> {
     super.initState();
     _pages = [
       {
-        'page': const ChaptersBookmarkScreen(),
+        'page': const BookmarkedChaptersScreen(),
       },
       {
-        'page': const VersesBookmarkScreen(),
+        'page': const BookmarkedVersesScreen(),
       },
     ];
   }
