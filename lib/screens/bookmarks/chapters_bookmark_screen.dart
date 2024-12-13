@@ -3,11 +3,11 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import '../../controllers/bookmarks_controller.dart';
 import '../../widgets/empty_bookmarks.dart';
+import '../../providers/bookmarks_provider.dart';
 import '../tabs/tab_screen.dart';
 
 class ChaptersBookmarkScreen extends StatefulWidget {
@@ -92,8 +92,13 @@ class _ChaptersBookmarkScreenState extends State<ChaptersBookmarkScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final BookmarksController bookmarksController = Get.find();
-    bookmarksController.loadChaptersBookmark();
+    final bookmarksProvider = Provider.of<BookmarksProvider>(context);
+    bookmarksProvider.loadChaptersBookmark();
+    final bookmarkedSet = bookmarksProvider.bookmarkedChapters.toSet();
+    final bookmarked = bookmarksProvider.chapters
+        .where((chapter) =>
+            bookmarkedSet.contains(chapter['chapter_number'].toString()))
+        .toList();
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -106,77 +111,57 @@ class _ChaptersBookmarkScreenState extends State<ChaptersBookmarkScreen> {
       bottomNavigationBar: isBannerLoaded
           ? SizedBox(height: 50, child: AdWidget(ad: bannerAd))
           : null,
-      body: Obx(() {
-        // final bookmarked = bookmarksController.chapters
-        //     .where((chapter) => bookmarksController.bookmarkedChapters
-        //     .contains(chapter['chapter_number'].toString()))
-        //     .toList();
-
-        // final bookmarked = bookmarksController.bookmarkedChapters
-        //     .map((chapterNumber) => bookmarksController.chapters.firstWhere(
-        //         (chapter) =>
-        //     chapter['chapter_number'].toString() == chapterNumber))
-        //     .toList();
-
-        final bookmarkedSet = bookmarksController.bookmarkedChapters.toSet();
-        final bookmarked = bookmarksController.chapters
-            .where((chapter) =>
-                bookmarkedSet.contains(chapter['chapter_number'].toString()))
-            .toList();
-
-        if (bookmarked.isEmpty) {
-          return const EmptyBookmarks(msg: 'No bookmarked chapters');
-        }
-        return ListView.builder(
-          itemCount: bookmarked.length,
-          itemBuilder: (context, index) {
-            final chapter = bookmarked[index];
-            final chapterName = utf8.decode(chapter['name'].runes.toList());
-            return Card(
-              color: Colors.brown,
-              child: ListTile(
-                onTap: () {
-                  if (isInterstitialLoaded) interstitialAd.show();
-                  Navigator.push(
-                    context,
-                    CupertinoPageRoute(
-                        builder: (_) => TabScreen(chapter: chapter)),
-                  );
-                },
-                leading:
-                    CircleAvatar(child: Text('${chapter['chapter_number']}')),
-                title: Text(
-                  chapterName,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.orange.shade400,
-                  ),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      chapter['name_translated'],
+      body: bookmarked.isEmpty
+          ? const EmptyBookmarks(msg: 'No bookmarked chapters')
+          : ListView.builder(
+              itemCount: bookmarked.length,
+              itemBuilder: (context, index) {
+                final chapter = bookmarked[index];
+                final chapterName = utf8.decode(chapter['name'].runes.toList());
+                return Card(
+                  color: Colors.brown,
+                  child: ListTile(
+                    onTap: () {
+                      if (isInterstitialLoaded) interstitialAd.show();
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                            builder: (_) => TabScreen(chapter: chapter)),
+                      );
+                    },
+                    leading: CircleAvatar(
+                        child: Text('${chapter['chapter_number']}')),
+                    title: Text(
+                      chapterName,
                       style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        color: Colors.amber.shade200,
-                      ),
-                    ),
-                    Text(
-                      'Verses: ${chapter['verses_count']}',
-                      style: TextStyle(
+                        fontSize: 22,
                         fontWeight: FontWeight.bold,
-                        color: Colors.blueGrey.shade100,
+                        color: Colors.orange.shade400,
                       ),
                     ),
-                  ],
-                ),
-              ),
-            );
-          },
-        );
-      }),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          chapter['name_translated'],
+                          style: TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: Colors.amber.shade200,
+                          ),
+                        ),
+                        Text(
+                          'Verses: ${chapter['verses_count']}',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blueGrey.shade100,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
     );
   }
 }

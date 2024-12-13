@@ -4,15 +4,16 @@ import 'dart:math' as m;
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:get/get.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:in_app_update/in_app_update.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import '../controllers/bookmarks_controller.dart';
 import '../services/api_service.dart';
-import '../widgets/internet_connectivity_button.dart';
+import '../providers/bookmarks_provider.dart';
+import '../providers/last_read_provider.dart';
 import '../widgets/main_drawer.dart';
+import '../widgets/internet_connectivity_button.dart';
 import 'tabs/tab_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -24,8 +25,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ApiService apiService = ApiService();
-  late Future<List<dynamic>> chapters;
   final FlutterTts textToSpeech = FlutterTts();
+  late Future<List<dynamic>> chapters;
   bool isBannerLoaded = false;
   late BannerAd bannerAd;
   bool isInterstitialLoaded = false;
@@ -129,6 +130,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bookmarkProvider =
+        Provider.of<BookmarksProvider>(context, listen: false);
+    final lastReadProvider = Provider.of<LastReadProvider>(context);
+    String lastReadSummary = lastReadProvider.lastReadChapter;
+    String lastReadVerse = lastReadProvider.lastReadVerse;
     return Scaffold(
       appBar: AppBar(
           centerTitle: true,
@@ -159,61 +165,171 @@ class _HomeScreenState extends State<HomeScreen> {
                       chapters = apiService.fetchChapters();
                     }));
           } else {
-            final BookmarksController bookmarksController = Get.find();
-            bookmarksController.setChapters(snapshot.data!);
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                final chapter = snapshot.data![index];
-                final chapterName = utf8.decode(chapter['name'].runes.toList());
-                return Card(
-                  color: Colors.brown,
-                  child: ListTile(
-                    onTap: () {
-                      if (isInterstitialLoaded) interstitialAd.show();
-                      Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                              builder: (_) => TabScreen(chapter: chapter)));
-                    },
-                    leading: CircleAvatar(
-                        child: Text('${chapter['chapter_number']}')),
-                    title: Text(
-                      chapterName,
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange.shade400,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              bookmarkProvider.setChapters(snapshot.data!);
+            });
+            return Stack(
+              children: [
+                SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    children: [
+                      Image.asset('assets/images/book.png', width: 140),
+                      for (var chapter in snapshot.data!)
+                        Card(
+                          color: Colors.brown,
+                          child: ListTile(
+                            onTap: () {
+                              if (isInterstitialLoaded) interstitialAd.show();
+                              Provider.of<LastReadProvider>(context,
+                                      listen: false)
+                                  .updateLastRead(
+                                      chapter['chapter_number'].toString(), '');
+                              Navigator.push(
+                                  context,
+                                  CupertinoPageRoute(
+                                      builder: (_) =>
+                                          TabScreen(chapter: chapter)));
+                            },
+                            leading: CircleAvatar(
+                                child: Text('${chapter['chapter_number']}')),
+                            title: Text(
+                              utf8.decode(chapter['name'].runes.toList()),
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.orange.shade400,
+                              ),
+                            ),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  chapter['name_translated'],
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w700,
+                                    color: Colors.amber.shade200,
+                                  ),
+                                ),
+                                Text(
+                                  'Verses: ${chapter['verses_count']}',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blueGrey.shade100,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            trailing: IconButton(
+                              onPressed: () => _speak(
+                                  utf8.decode(chapter['name'].runes.toList())),
+                              tooltip: 'Pronounce',
+                              color: Colors.amber.shade200,
+                              icon: const Icon(CupertinoIcons.speaker_2),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(top: 8.0, left: 8, right: 8),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    height: 130,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        gradient: const LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            stops: [
+                              0,
+                              .6,
+                              1
+                            ],
+                            colors: [
+                              Color(0xFFF9A602), // Bright Saffron Yellow
+                              Color(0xFFFF7F11), // Reddish Saffron
+                              Color(0xFFF36A1C), // Deep Saffron Orange
+                            ])),
+                    child: Row(
                       children: [
-                        Text(
-                          chapter['name_translated'],
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            color: Colors.amber.shade200,
+                        if (lastReadSummary == '')
+                          RichText(
+                            text: const TextSpan(
+                              text: 'Start reading\n\n',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                                color: Colors.black54,
+                              ),
+                              children: [
+                                TextSpan(
+                                  text: 'THE DIVINE SONG\nOF GOD',
+                                  style: TextStyle(
+                                    fontSize: 17,
+                                    letterSpacing: 1,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              ],
+                            ),
                           ),
-                        ),
-                        Text(
-                          'Verses: ${chapter['verses_count']}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blueGrey.shade100,
+                        if (lastReadSummary != '')
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Icon(
+                                    Icons.menu_book_rounded,
+                                    color: Colors.black54,
+                                  ),
+                                  SizedBox(
+                                    width: 8,
+                                  ),
+                                  Text(
+                                    'Last Read',
+                                    style: TextStyle(
+                                        color: Colors.black54,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 20,
+                              ),
+                              Text(
+                                'Chapter $lastReadSummary',
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 18),
+                              ),
+                              const SizedBox(
+                                height: 4,
+                              ),
+                              if (lastReadVerse != '')
+                                Text(
+                                  'Verse $lastReadVerse',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                            ],
                           ),
-                        ),
+                        const Spacer(),
+                        Image.asset(
+                          'assets/images/book.png',
+                          width: 150,
+                        )
                       ],
                     ),
-                    trailing: IconButton(
-                      onPressed: () => _speak(chapterName),
-                      tooltip: 'Pronounce',
-                      color: Colors.amber.shade200,
-                      icon: const Icon(CupertinoIcons.speaker_2),
-                    ),
                   ),
-                );
-              },
+                ),
+              ],
             );
           }
         },

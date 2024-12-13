@@ -1,15 +1,15 @@
-import 'dart:collection';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:collection';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import '../../../controllers/bookmarks_controller.dart';
 import '../../../services/api_service.dart';
+import '../../../providers/bookmarks_provider.dart';
 import '../../../widgets/internet_connectivity_button.dart';
 
 class VerseScreen extends StatefulWidget {
@@ -28,7 +28,6 @@ class VerseScreen extends StatefulWidget {
 
 class _VerseScreenState extends State<VerseScreen> {
   final ApiService apiService = ApiService();
-  final BookmarksController _bookmarksController = Get.find();
   late Future<Map<String, dynamic>> verse;
   bool isBannerLoaded = false;
   late BannerAd bannerAd;
@@ -75,8 +74,6 @@ class _VerseScreenState extends State<VerseScreen> {
       bookmarks[verseNumber] = verseNumber;
       box.put(chapterNumber, bookmarks);
     }
-
-    _bookmarksController.loadVersesBookmark();
   }
 
   bool _isBookmarked(String chapterNumber, String verseNumber) {
@@ -103,6 +100,8 @@ class _VerseScreenState extends State<VerseScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bookmarksProvider =
+        Provider.of<BookmarksProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -113,8 +112,11 @@ class _VerseScreenState extends State<VerseScreen> {
         title: Text('Verse ${widget.verseNumber}'),
         actions: [
           IconButton(
-            onPressed: () => setState(() =>
-                _toggleBookmark(widget.chapterNumber, widget.verseNumber)),
+            onPressed: () {
+              setState(() =>
+                  _toggleBookmark(widget.chapterNumber, widget.verseNumber));
+              bookmarksProvider.loadVersesBookmark();
+            },
             tooltip: 'Bookmark',
             icon: Icon(
               _isBookmarked(widget.chapterNumber, widget.verseNumber)

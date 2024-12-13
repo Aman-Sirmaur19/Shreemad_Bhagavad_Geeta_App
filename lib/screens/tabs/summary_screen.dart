@@ -3,11 +3,11 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:hive/hive.dart';
+import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import '../../controllers/bookmarks_controller.dart';
+import '../../providers/bookmarks_provider.dart';
 
 class SummaryScreen extends StatefulWidget {
   final dynamic chapter;
@@ -19,7 +19,6 @@ class SummaryScreen extends StatefulWidget {
 }
 
 class _SummaryScreenState extends State<SummaryScreen> {
-  final BookmarksController _bookmarksController = Get.find();
   bool isBannerLoaded = false;
   late BannerAd bannerAd;
 
@@ -51,7 +50,6 @@ class _SummaryScreenState extends State<SummaryScreen> {
     } else {
       box.put(chapterNumber, chapterNumber);
     }
-    _bookmarksController.loadChaptersBookmark();
   }
 
   bool _isBookmarked(String chapterNumber) {
@@ -73,6 +71,8 @@ class _SummaryScreenState extends State<SummaryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bookmarksProvider =
+        Provider.of<BookmarksProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -83,8 +83,11 @@ class _SummaryScreenState extends State<SummaryScreen> {
         title: Text('Chapter ${widget.chapter['chapter_number']}'),
         actions: [
           IconButton(
-            onPressed: () => setState(() =>
-                _toggleBookmark(widget.chapter['chapter_number'].toString())),
+            onPressed: () {
+              setState(() =>
+                  _toggleBookmark(widget.chapter['chapter_number'].toString()));
+              bookmarksProvider.loadChaptersBookmark();
+            },
             tooltip: 'Bookmark',
             icon: Icon(
               _isBookmarked(widget.chapter['chapter_number'].toString())

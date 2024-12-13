@@ -2,8 +2,10 @@ import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import '../../../providers/last_read_provider.dart';
 import 'verse_screen.dart';
 
 class AllVersesScreen extends StatefulWidget {
@@ -114,6 +116,9 @@ class _AllVersesScreenState extends State<AllVersesScreen> {
               child: ListTile(
                   onTap: () {
                     if (isInterstitialLoaded) interstitialAd.show();
+                    Provider.of<LastReadProvider>(context, listen: false)
+                        .updateLastRead(
+                            widget.chapterNumber, (index + 1).toString());
                     Navigator.push(
                         context,
                         CupertinoPageRoute(

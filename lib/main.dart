@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import 'controllers/bookmarks_controller.dart';
 import 'screens/home_screen.dart';
+import 'providers/last_read_provider.dart';
+import 'providers/bookmarks_provider.dart';
 
 late Size mq;
 
@@ -14,8 +15,14 @@ Future<void> main() async {
   await Hive.initFlutter();
   await Hive.openBox<String>('summaryBookmarks');
   await Hive.openBox<Map>('verseBookmarks');
-  Get.put(BookmarksController());
-  runApp(const MyApp());
+  await Hive.openBox('lastReadBox');
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(create: (_) => LastReadProvider()),
+      ChangeNotifierProvider(create: (_) => BookmarksProvider()),
+    ],
+    child: const MyApp(),
+  ));
 }
 
 void _initializeMobileAds() async {
@@ -30,7 +37,7 @@ class MyApp extends StatelessWidget {
     mq = MediaQuery.of(context).size;
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Shreemad Bhagwad Geeta',
+      title: 'Shreemad Bhagavad Geeta',
       theme: ThemeData(
         appBarTheme: const AppBarTheme(
           titleTextStyle: TextStyle(
