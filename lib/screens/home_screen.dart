@@ -9,6 +9,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:in_app_update/in_app_update.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import '../secrets.dart';
 import '../services/api_service.dart';
 import '../providers/bookmarks_provider.dart';
 import '../providers/last_read_provider.dart';
@@ -73,7 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _initializeBannerAd() async {
     bannerAd = BannerAd(
       size: AdSize.banner,
-      adUnitId: 'ca-app-pub-9389901804535827/5411361970',
+      adUnitId: Secrets.bannerAdId,
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           setState(() {
@@ -93,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _initializeInterstitialAd() async {
     InterstitialAd.load(
-      adUnitId: 'ca-app-pub-9389901804535827/8281628976',
+      adUnitId: Secrets.interstitialAdId,
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {

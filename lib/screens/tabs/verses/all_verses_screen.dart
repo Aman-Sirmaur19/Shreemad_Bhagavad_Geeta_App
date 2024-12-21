@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../../providers/last_read_provider.dart';
+import '../../../secrets.dart';
 import 'verse_screen.dart';
 
 class AllVersesScreen extends StatefulWidget {
@@ -42,7 +43,7 @@ class _AllVersesScreenState extends State<AllVersesScreen> {
   void _initializeBannerAd() async {
     bannerAd = BannerAd(
       size: AdSize.banner,
-      adUnitId: 'ca-app-pub-9389901804535827/5411361970',
+      adUnitId: Secrets.bannerAdId,
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           setState(() {
@@ -62,7 +63,7 @@ class _AllVersesScreenState extends State<AllVersesScreen> {
 
   void _initializeInterstitialAd() async {
     InterstitialAd.load(
-      adUnitId: 'ca-app-pub-9389901804535827/8281628976',
+      adUnitId: Secrets.interstitialAdId,
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {

@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import '../secrets.dart';
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -30,7 +32,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _initializeBannerAd() async {
     bannerAd = BannerAd(
       size: AdSize.banner,
-      adUnitId: 'ca-app-pub-9389901804535827/5411361970',
+      adUnitId: Secrets.bannerAdId,
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           setState(() {

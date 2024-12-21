@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import '../../secrets.dart';
 import '../../widgets/empty_bookmarks.dart';
 import '../../providers/bookmarks_provider.dart';
 import '../tabs/tab_screen.dart';
@@ -40,7 +41,7 @@ class _BookmarkedChaptersScreenState extends State<BookmarkedChaptersScreen> {
   void _initializeBannerAd() async {
     bannerAd = BannerAd(
       size: AdSize.banner,
-      adUnitId: 'ca-app-pub-9389901804535827/5411361970',
+      adUnitId: Secrets.bannerAdId,
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           setState(() {
@@ -60,7 +61,7 @@ class _BookmarkedChaptersScreenState extends State<BookmarkedChaptersScreen> {
 
   void _initializeInterstitialAd() async {
     InterstitialAd.load(
-      adUnitId: 'ca-app-pub-9389901804535827/8281628976',
+      adUnitId: Secrets.interstitialAdId,
       request: const AdRequest(),
       adLoadCallback: InterstitialAdLoadCallback(
         onAdLoaded: (ad) {

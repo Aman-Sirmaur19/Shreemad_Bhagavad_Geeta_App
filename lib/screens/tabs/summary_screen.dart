@@ -7,6 +7,7 @@ import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import '../../secrets.dart';
 import '../../providers/bookmarks_provider.dart';
 
 class SummaryScreen extends StatefulWidget {
@@ -25,7 +26,7 @@ class _SummaryScreenState extends State<SummaryScreen> {
   void _initializeBannerAd() async {
     bannerAd = BannerAd(
       size: AdSize.banner,
-      adUnitId: 'ca-app-pub-9389901804535827/5411361970',
+      adUnitId: Secrets.bannerAdId,
       listener: BannerAdListener(
         onAdLoaded: (ad) {
           setState(() {
