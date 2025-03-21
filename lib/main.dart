@@ -4,6 +4,7 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'screens/home_screen.dart';
+import 'providers/language_provider.dart';
 import 'providers/last_read_provider.dart';
 import 'providers/bookmarks_provider.dart';
 
@@ -13,11 +14,13 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   _initializeMobileAds();
   await Hive.initFlutter();
+  await Hive.openBox('lastReadBox');
+  await Hive.openBox('languageBox');
   await Hive.openBox<String>('summaryBookmarks');
   await Hive.openBox<Map>('verseBookmarks');
-  await Hive.openBox('lastReadBox');
   runApp(MultiProvider(
     providers: [
+      ChangeNotifierProvider(create: (_) => LanguageProvider()),
       ChangeNotifierProvider(create: (_) => LastReadProvider()),
       ChangeNotifierProvider(create: (_) => BookmarksProvider()),
     ],

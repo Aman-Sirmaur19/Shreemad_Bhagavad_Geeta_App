@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../main.dart';
+import '../screens/languages_screen.dart';
 import '../screens/bookmarks/bookmarks_tab_screen.dart';
 
 class MainDrawer extends StatelessWidget {
@@ -62,12 +63,12 @@ class MainDrawer extends StatelessWidget {
           ),
           const Divider(color: Colors.black12),
           SizedBox(height: mq.height * .01),
-          // buildListTile(
-          //   'Settings',
-          //   CupertinoIcons.gear,
-          //   () => Navigator.push(context,
-          //       CupertinoPageRoute(builder: (_) => const SettingsScreen())),
-          // ),
+          buildListTile(
+            'Languages',
+            Icons.g_translate_rounded,
+            () => Navigator.push(context,
+                CupertinoPageRoute(builder: (_) => const LanguagesScreen())),
+          ),
           buildListTile(
             'Bookmarks',
             CupertinoIcons.bookmark,

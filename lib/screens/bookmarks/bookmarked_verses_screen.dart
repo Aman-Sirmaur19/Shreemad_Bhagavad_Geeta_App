@@ -8,6 +8,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../secrets.dart';
 import '../../services/api_service.dart';
+import '../../widgets/custom_banner_ad.dart';
 import '../../widgets/empty_bookmarks.dart';
 import '../../providers/bookmarks_provider.dart';
 import '../tabs/verses/verse_screen.dart';
@@ -20,44 +21,19 @@ class BookmarkedVersesScreen extends StatefulWidget {
 }
 
 class _BookmarkedVersesScreenState extends State<BookmarkedVersesScreen> {
-  bool isBannerLoaded = false;
-  late BannerAd bannerAd;
   bool isInterstitialLoaded = false;
   late InterstitialAd interstitialAd;
 
   @override
   void initState() {
     super.initState();
-    _initializeBannerAd();
     _initializeInterstitialAd();
   }
 
   @override
   void dispose() {
     super.dispose();
-    bannerAd.dispose();
     interstitialAd.dispose();
-  }
-
-  void _initializeBannerAd() async {
-    bannerAd = BannerAd(
-      size: AdSize.banner,
-      adUnitId: Secrets.bannerAdId,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            isBannerLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-          isBannerLoaded = false;
-          log(error.message);
-        },
-      ),
-      request: const AdRequest(),
-    );
-    bannerAd.load();
   }
 
   void _initializeInterstitialAd() async {
@@ -105,9 +81,7 @@ class _BookmarkedVersesScreenState extends State<BookmarkedVersesScreen> {
         ),
         title: const Text('Bookmarked Verses'),
       ),
-      bottomNavigationBar: isBannerLoaded
-          ? SizedBox(height: 50, child: AdWidget(ad: bannerAd))
-          : null,
+      bottomNavigationBar: const CustomBannerAd(),
       body: bookmarksProvider.bookmarkedVerses.isEmpty
           ? const EmptyBookmarks(msg: 'No bookmarked verses')
           : ListView.builder(
@@ -127,6 +101,7 @@ class _BookmarkedVersesScreenState extends State<BookmarkedVersesScreen> {
                 return Card(
                   color: Colors.brown,
                   child: ExpansionTile(
+                    shape: const RoundedRectangleBorder(side: BorderSide.none),
                     leading: CircleAvatar(child: Text(chapterNumber)),
                     title: Text(
                       chapterName,

@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../secrets.dart';
+import '../../widgets/custom_banner_ad.dart';
 import '../../widgets/empty_bookmarks.dart';
 import '../../providers/bookmarks_provider.dart';
 import '../tabs/tab_screen.dart';
@@ -15,48 +16,24 @@ class BookmarkedChaptersScreen extends StatefulWidget {
   const BookmarkedChaptersScreen({super.key});
 
   @override
-  State<BookmarkedChaptersScreen> createState() => _BookmarkedChaptersScreenState();
+  State<BookmarkedChaptersScreen> createState() =>
+      _BookmarkedChaptersScreenState();
 }
 
 class _BookmarkedChaptersScreenState extends State<BookmarkedChaptersScreen> {
-  bool isBannerLoaded = false;
-  late BannerAd bannerAd;
   bool isInterstitialLoaded = false;
   late InterstitialAd interstitialAd;
 
   @override
   void initState() {
     super.initState();
-    _initializeBannerAd();
     _initializeInterstitialAd();
   }
 
   @override
   void dispose() {
     super.dispose();
-    bannerAd.dispose();
     interstitialAd.dispose();
-  }
-
-  void _initializeBannerAd() async {
-    bannerAd = BannerAd(
-      size: AdSize.banner,
-      adUnitId: Secrets.bannerAdId,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            isBannerLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-          isBannerLoaded = false;
-          log(error.message);
-        },
-      ),
-      request: const AdRequest(),
-    );
-    bannerAd.load();
   }
 
   void _initializeInterstitialAd() async {
@@ -109,9 +86,7 @@ class _BookmarkedChaptersScreenState extends State<BookmarkedChaptersScreen> {
         ),
         title: const Text('Bookmarked Chapters'),
       ),
-      bottomNavigationBar: isBannerLoaded
-          ? SizedBox(height: 50, child: AdWidget(ad: bannerAd))
-          : null,
+      bottomNavigationBar: const CustomBannerAd(),
       body: bookmarked.isEmpty
           ? const EmptyBookmarks(msg: 'No bookmarked chapters')
           : ListView.builder(

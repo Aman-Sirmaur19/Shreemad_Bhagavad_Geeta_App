@@ -7,6 +7,7 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import '../../../providers/last_read_provider.dart';
 import '../../../secrets.dart';
+import '../../../widgets/custom_banner_ad.dart';
 import 'verse_screen.dart';
 
 class AllVersesScreen extends StatefulWidget {
@@ -21,44 +22,19 @@ class AllVersesScreen extends StatefulWidget {
 }
 
 class _AllVersesScreenState extends State<AllVersesScreen> {
-  bool isBannerLoaded = false;
-  late BannerAd bannerAd;
   bool isInterstitialLoaded = false;
   late InterstitialAd interstitialAd;
 
   @override
   void initState() {
     super.initState();
-    _initializeBannerAd();
     _initializeInterstitialAd();
   }
 
   @override
   void dispose() {
     super.dispose();
-    bannerAd.dispose();
     interstitialAd.dispose();
-  }
-
-  void _initializeBannerAd() async {
-    bannerAd = BannerAd(
-      size: AdSize.banner,
-      adUnitId: Secrets.bannerAdId,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            isBannerLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-          isBannerLoaded = false;
-          log(error.message);
-        },
-      ),
-      request: const AdRequest(),
-    );
-    bannerAd.load();
   }
 
   void _initializeInterstitialAd() async {
@@ -104,10 +80,9 @@ class _AllVersesScreenState extends State<AllVersesScreen> {
         ),
         title: const Text('Verses'),
       ),
-      bottomNavigationBar: isBannerLoaded
-          ? SizedBox(height: 50, child: AdWidget(ad: bannerAd))
-          : null,
+      bottomNavigationBar: const CustomBannerAd(),
       body: ListView.builder(
+        physics: const BouncingScrollPhysics(),
         itemCount: widget.numberOfVerses,
         itemBuilder: (context, index) {
           return Padding(
@@ -116,7 +91,7 @@ class _AllVersesScreenState extends State<AllVersesScreen> {
               color: Colors.brown,
               child: ListTile(
                   onTap: () {
-                    if (isInterstitialLoaded) interstitialAd.show();
+                    // if (isInterstitialLoaded) interstitialAd.show();
                     Provider.of<LastReadProvider>(context, listen: false)
                         .updateLastRead(
                             widget.chapterNumber, (index + 1).toString());

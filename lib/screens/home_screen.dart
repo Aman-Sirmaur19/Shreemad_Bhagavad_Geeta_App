@@ -13,6 +13,7 @@ import '../secrets.dart';
 import '../services/api_service.dart';
 import '../providers/bookmarks_provider.dart';
 import '../providers/last_read_provider.dart';
+import '../widgets/custom_banner_ad.dart';
 import '../widgets/main_drawer.dart';
 import '../widgets/internet_connectivity_button.dart';
 import 'tabs/tab_screen.dart';
@@ -28,8 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final ApiService apiService = ApiService();
   final FlutterTts textToSpeech = FlutterTts();
   late Future<List<dynamic>> chapters;
-  bool isBannerLoaded = false;
-  late BannerAd bannerAd;
   bool isInterstitialLoaded = false;
   late InterstitialAd interstitialAd;
 
@@ -37,7 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _checkForUpdate();
-    _initializeBannerAd();
     _initializeInterstitialAd();
     chapters = apiService.fetchChapters();
   }
@@ -45,7 +43,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void dispose() {
     super.dispose();
-    bannerAd.dispose();
     interstitialAd.dispose();
   }
 
@@ -69,27 +66,6 @@ class _HomeScreenState extends State<HomeScreen> {
     InAppUpdate.completeFlexibleUpdate().then((_) {}).catchError((error) {
       log(error.toString());
     });
-  }
-
-  void _initializeBannerAd() async {
-    bannerAd = BannerAd(
-      size: AdSize.banner,
-      adUnitId: Secrets.bannerAdId,
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            isBannerLoaded = true;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          ad.dispose();
-          isBannerLoaded = false;
-          log(error.message);
-        },
-      ),
-      request: const AdRequest(),
-    );
-    bannerAd.load();
   }
 
   void _initializeInterstitialAd() async {
@@ -152,9 +128,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           )),
       drawer: const MainDrawer(),
-      bottomNavigationBar: isBannerLoaded
-          ? SizedBox(height: 50, child: AdWidget(ad: bannerAd))
-          : null,
+      bottomNavigationBar: const CustomBannerAd(),
       body: FutureBuilder<List<dynamic>>(
         future: chapters,
         builder: (context, snapshot) {
@@ -181,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           color: Colors.brown,
                           child: ListTile(
                             onTap: () {
-                              if (isInterstitialLoaded) interstitialAd.show();
+                              // if (isInterstitialLoaded) interstitialAd.show();
                               Provider.of<LastReadProvider>(context,
                                       listen: false)
                                   .updateLastRead(
@@ -221,13 +195,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ],
                             ),
-                            trailing: IconButton(
-                              onPressed: () => _speak(
-                                  utf8.decode(chapter['name'].runes.toList())),
-                              tooltip: 'Pronounce',
-                              color: Colors.amber.shade200,
-                              icon: const Icon(CupertinoIcons.speaker_2),
-                            ),
+                            // trailing: IconButton(
+                            //   onPressed: () => _speak(
+                            //       utf8.decode(chapter['name'].runes.toList())),
+                            //   tooltip: 'Pronounce',
+                            //   color: Colors.amber.shade200,
+                            //   icon: const Icon(CupertinoIcons.speaker_2),
+                            // ),
                           ),
                         ),
                     ],
