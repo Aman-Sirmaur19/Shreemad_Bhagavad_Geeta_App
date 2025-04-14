@@ -224,7 +224,7 @@ class _VerseScreenState extends State<VerseScreen> {
                                     ),
                                   ),
                                 ),
-                                if (selectedLanguageName != 'English')
+                                if (selectedLanguageName != 'Hindi')
                                   SingleChildScrollView(
                                     physics: const BouncingScrollPhysics(),
                                     child: Text(
