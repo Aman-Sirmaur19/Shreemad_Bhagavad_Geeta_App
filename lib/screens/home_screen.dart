@@ -275,9 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                 ],
                               ),
-                              const SizedBox(
-                                height: 20,
-                              ),
+                              const SizedBox(height: 20),
                               Text(
                                 'Chapter $lastReadSummary',
                                 style: const TextStyle(
@@ -285,9 +283,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     fontWeight: FontWeight.w600,
                                     fontSize: 18),
                               ),
-                              const SizedBox(
-                                height: 4,
-                              ),
+                              const SizedBox(height: 4),
                               if (lastReadVerse != '')
                                 Text(
                                   'Verse $lastReadVerse',

@@ -19,12 +19,8 @@ class _BookmarksTabScreenState extends State<BookmarksTabScreen> {
   void initState() {
     super.initState();
     _pages = [
-      {
-        'page': const BookmarkedChaptersScreen(),
-      },
-      {
-        'page': const BookmarkedVersesScreen(),
-      },
+      {'page': const BookmarkedChaptersScreen()},
+      {'page': const BookmarkedVersesScreen()},
     ];
   }
 
@@ -42,17 +38,16 @@ class _BookmarksTabScreenState extends State<BookmarksTabScreen> {
         onTap: _selectPage,
         selectedItemColor: Colors.amber,
         unselectedItemColor: Colors.grey,
+        backgroundColor: Colors.black87,
         currentIndex: _selectedPageIndex,
-        type: BottomNavigationBarType.shifting,
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.list_bullet_indent),
-            backgroundColor: Colors.black87,
             label: 'Chapters',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.menu_book_rounded),
-            backgroundColor: Colors.black87,
             label: 'Verses',
           ),
         ],

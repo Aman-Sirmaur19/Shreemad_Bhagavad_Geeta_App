@@ -21,9 +21,7 @@ class _TabScreenState extends State<TabScreen> {
   void initState() {
     super.initState();
     _pages = [
-      {
-        'page': SummaryScreen(chapter: widget.chapter),
-      },
+      {'page': SummaryScreen(chapter: widget.chapter)},
       {
         'page': AllVersesScreen(
           chapterNumber: widget.chapter['chapter_number'].toString(),
@@ -47,17 +45,16 @@ class _TabScreenState extends State<TabScreen> {
         onTap: _selectPage,
         selectedItemColor: Colors.amber,
         unselectedItemColor: Colors.grey,
+        backgroundColor: Colors.black87,
         currentIndex: _selectedPageIndex,
-        type: BottomNavigationBarType.shifting,
+        type: BottomNavigationBarType.fixed,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.pencil_outline),
-            backgroundColor: Colors.black87,
             label: 'Summary',
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.list_bullet_indent),
-            backgroundColor: Colors.black87,
             label: 'Verses',
           ),
         ],
