@@ -5,6 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../main.dart';
 import '../screens/languages_screen.dart';
 import '../screens/bookmarks/bookmarks_tab_screen.dart';
+import '../services/ad_manager.dart';
 
 class MainDrawer extends StatelessWidget {
   const MainDrawer({super.key});
@@ -66,14 +67,13 @@ class MainDrawer extends StatelessWidget {
           buildListTile(
             'Languages',
             Icons.g_translate_rounded,
-            () => Navigator.push(context,
-                CupertinoPageRoute(builder: (_) => const LanguagesScreen())),
+            () => AdManager().navigateWithAd(context, const LanguagesScreen()),
           ),
           buildListTile(
             'Bookmarks',
             CupertinoIcons.bookmark,
-            () => Navigator.push(context,
-                CupertinoPageRoute(builder: (_) => const BookmarksTabScreen())),
+            () =>
+                AdManager().navigateWithAd(context, const BookmarksTabScreen()),
           ),
           buildListTile(
             'More Apps',

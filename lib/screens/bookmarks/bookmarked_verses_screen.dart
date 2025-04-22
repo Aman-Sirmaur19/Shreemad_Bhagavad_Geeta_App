@@ -1,12 +1,10 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import '../../secrets.dart';
+import '../../services/ad_manager.dart';
 import '../../services/api_service.dart';
 import '../../widgets/custom_banner_ad.dart';
 import '../../widgets/empty_bookmarks.dart';
@@ -21,53 +19,6 @@ class BookmarkedVersesScreen extends StatefulWidget {
 }
 
 class _BookmarkedVersesScreenState extends State<BookmarkedVersesScreen> {
-  bool isInterstitialLoaded = false;
-  late InterstitialAd interstitialAd;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeInterstitialAd();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    interstitialAd.dispose();
-  }
-
-  void _initializeInterstitialAd() async {
-    InterstitialAd.load(
-      adUnitId: Secrets.interstitialAdId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          interstitialAd = ad;
-          setState(() {
-            isInterstitialLoaded = true;
-          });
-          interstitialAd.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              ad.dispose();
-              _initializeInterstitialAd();
-            },
-            onAdFailedToShowFullScreenContent: (ad, error) {
-              log('Ad failed to show: ${error.message}');
-              ad.dispose();
-              _initializeInterstitialAd();
-            },
-          );
-        },
-        onAdFailedToLoad: (error) {
-          log('Failed to load interstitial ad: ${error.message}');
-          setState(() {
-            isInterstitialLoaded = false;
-          });
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final bookmarksProvider = Provider.of<BookmarksProvider>(context);
@@ -169,17 +120,12 @@ class _BookmarkedVersesScreenState extends State<BookmarkedVersesScreen> {
                             return Card(
                               color: Colors.brown.shade400,
                               child: ListTile(
-                                onTap: () {
-                                  if (isInterstitialLoaded)
-                                    interstitialAd.show();
-                                  Navigator.push(
-                                      context,
-                                      CupertinoPageRoute(
-                                          builder: (_) => VerseScreen(
-                                                chapterNumber: chapterNumber,
-                                                verseNumber: verseNumber,
-                                              )));
-                                },
+                                onTap: () => AdManager().navigateWithAd(
+                                    context,
+                                    VerseScreen(
+                                      chapterNumber: chapterNumber,
+                                      verseNumber: verseNumber,
+                                    )),
                                 leading: CircleAvatar(child: Text(verseNumber)),
                                 title: Text(
                                   verseText,

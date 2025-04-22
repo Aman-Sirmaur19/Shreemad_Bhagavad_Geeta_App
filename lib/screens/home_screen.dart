@@ -1,15 +1,12 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:math' as m;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:in_app_update/in_app_update.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import '../secrets.dart';
+import '../services/ad_manager.dart';
 import '../services/api_service.dart';
 import '../providers/bookmarks_provider.dart';
 import '../providers/last_read_provider.dart';
@@ -29,75 +26,27 @@ class _HomeScreenState extends State<HomeScreen> {
   final ApiService apiService = ApiService();
   final FlutterTts textToSpeech = FlutterTts();
   late Future<List<dynamic>> chapters;
-  bool isInterstitialLoaded = false;
-  late InterstitialAd interstitialAd;
 
   @override
   void initState() {
     super.initState();
     _checkForUpdate();
-    _initializeInterstitialAd();
     chapters = apiService.fetchChapters();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-    interstitialAd.dispose();
-  }
-
   Future<void> _checkForUpdate() async {
-    log('Checking for Update!');
     await InAppUpdate.checkForUpdate().then((info) {
       setState(() {
         if (info.updateAvailability == UpdateAvailability.updateAvailable) {
-          log('Update available!');
           update();
         }
       });
-    }).catchError((error) {
-      log(error.toString());
-    });
+    }).catchError((error) {});
   }
 
   void update() async {
-    log('Updating');
     await InAppUpdate.startFlexibleUpdate();
-    InAppUpdate.completeFlexibleUpdate().then((_) {}).catchError((error) {
-      log(error.toString());
-    });
-  }
-
-  void _initializeInterstitialAd() async {
-    InterstitialAd.load(
-      adUnitId: Secrets.interstitialAdId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          interstitialAd = ad;
-          setState(() {
-            isInterstitialLoaded = true;
-          });
-          interstitialAd.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              ad.dispose();
-              _initializeInterstitialAd();
-            },
-            onAdFailedToShowFullScreenContent: (ad, error) {
-              log('Ad failed to show: ${error.message}');
-              ad.dispose();
-              _initializeInterstitialAd();
-            },
-          );
-        },
-        onAdFailedToLoad: (error) {
-          log('Failed to load interstitial ad: ${error.message}');
-          setState(() {
-            isInterstitialLoaded = false;
-          });
-        },
-      ),
-    );
+    InAppUpdate.completeFlexibleUpdate().then((_) {}).catchError((error) {});
   }
 
   void _speak(String text) async {
@@ -160,11 +109,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                       listen: false)
                                   .updateLastRead(
                                       chapter['chapter_number'].toString(), '');
-                              Navigator.push(
-                                  context,
-                                  CupertinoPageRoute(
-                                      builder: (_) =>
-                                          TabScreen(chapter: chapter)));
+                              AdManager().navigateWithAd(
+                                  context, TabScreen(chapter: chapter));
                             },
                             leading: CircleAvatar(
                                 child: Text('${chapter['chapter_number']}')),

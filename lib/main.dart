@@ -4,6 +4,7 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'screens/home_screen.dart';
+import 'services/ad_manager.dart';
 import 'providers/language_provider.dart';
 import 'providers/last_read_provider.dart';
 import 'providers/bookmarks_provider.dart';
@@ -30,6 +31,7 @@ Future<void> main() async {
 
 void _initializeMobileAds() async {
   await MobileAds.instance.initialize();
+  AdManager().initialize();
 }
 
 class MyApp extends StatelessWidget {

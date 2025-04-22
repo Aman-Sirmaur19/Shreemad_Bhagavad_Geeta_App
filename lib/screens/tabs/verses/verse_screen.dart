@@ -87,7 +87,7 @@ class _VerseScreenState extends State<VerseScreen> {
             tooltip: 'Back',
             icon: const Icon(CupertinoIcons.chevron_back),
           ),
-          title: Text('Verse ${widget.verseNumber}'),
+          title: Text('Verse ${widget.chapterNumber}.${widget.verseNumber}'),
           actions: [
             IconButton(
               onPressed: () {
@@ -136,10 +136,19 @@ class _VerseScreenState extends State<VerseScreen> {
               final englishTranslationText = utf8
                   .decode(englishTranslation['description'].runes.toList())
                   .trim();
-              final hindiCommentary = (item['commentaries'] as List).firstWhere(
+              final commentaries = item['commentaries'] as List;
+              final chinmaya = commentaries.firstWhere(
                 (t) => t['author_name'] == 'Swami Chinmayananda',
                 orElse: () => null,
               );
+              final hindiCommentary = (chinmaya != null &&
+                      (chinmaya['description'] as String)
+                          .contains('No commentary'))
+                  ? commentaries.firstWhere(
+                      (t) => t['author_name'] == 'Swami Ramsukhdas',
+                      orElse: () => null,
+                    )
+                  : chinmaya;
               final hindiCommentaryText = utf8
                   .decode(hindiCommentary['description'].runes.toList())
                   .trim();

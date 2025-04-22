@@ -1,12 +1,10 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
-import '../../secrets.dart';
+import '../../services/ad_manager.dart';
 import '../../widgets/custom_banner_ad.dart';
 import '../../widgets/empty_bookmarks.dart';
 import '../../providers/bookmarks_provider.dart';
@@ -21,53 +19,6 @@ class BookmarkedChaptersScreen extends StatefulWidget {
 }
 
 class _BookmarkedChaptersScreenState extends State<BookmarkedChaptersScreen> {
-  bool isInterstitialLoaded = false;
-  late InterstitialAd interstitialAd;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeInterstitialAd();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    interstitialAd.dispose();
-  }
-
-  void _initializeInterstitialAd() async {
-    InterstitialAd.load(
-      adUnitId: Secrets.interstitialAdId,
-      request: const AdRequest(),
-      adLoadCallback: InterstitialAdLoadCallback(
-        onAdLoaded: (ad) {
-          interstitialAd = ad;
-          setState(() {
-            isInterstitialLoaded = true;
-          });
-          interstitialAd.fullScreenContentCallback = FullScreenContentCallback(
-            onAdDismissedFullScreenContent: (ad) {
-              ad.dispose();
-              _initializeInterstitialAd();
-            },
-            onAdFailedToShowFullScreenContent: (ad, error) {
-              log('Ad failed to show: ${error.message}');
-              ad.dispose();
-              _initializeInterstitialAd();
-            },
-          );
-        },
-        onAdFailedToLoad: (error) {
-          log('Failed to load interstitial ad: ${error.message}');
-          setState(() {
-            isInterstitialLoaded = false;
-          });
-        },
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final bookmarksProvider = Provider.of<BookmarksProvider>(context);
@@ -97,14 +48,8 @@ class _BookmarkedChaptersScreenState extends State<BookmarkedChaptersScreen> {
                 return Card(
                   color: Colors.brown,
                   child: ListTile(
-                    onTap: () {
-                      if (isInterstitialLoaded) interstitialAd.show();
-                      Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                            builder: (_) => TabScreen(chapter: chapter)),
-                      );
-                    },
+                    onTap: () => AdManager()
+                        .navigateWithAd(context, TabScreen(chapter: chapter)),
                     leading: CircleAvatar(
                         child: Text('${chapter['chapter_number']}')),
                     title: Text(
