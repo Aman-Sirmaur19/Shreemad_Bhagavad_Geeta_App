@@ -6,8 +6,9 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'screens/home_screen.dart';
 import 'services/ad_manager.dart';
 import 'providers/language_provider.dart';
-import 'providers/last_read_provider.dart';
 import 'providers/bookmarks_provider.dart';
+import 'providers/font_size_provider.dart';
+import 'providers/last_read_provider.dart';
 
 late Size mq;
 
@@ -15,8 +16,9 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   _initializeMobileAds();
   await Hive.initFlutter();
-  await Hive.openBox('lastReadBox');
+  await Hive.openBox('settings');
   await Hive.openBox('languageBox');
+  await Hive.openBox('lastReadBox');
   await Hive.openBox<String>('summaryBookmarks');
   await Hive.openBox<Map>('verseBookmarks');
   runApp(MultiProvider(
@@ -24,6 +26,7 @@ Future<void> main() async {
       ChangeNotifierProvider(create: (_) => LanguageProvider()),
       ChangeNotifierProvider(create: (_) => LastReadProvider()),
       ChangeNotifierProvider(create: (_) => BookmarksProvider()),
+      ChangeNotifierProvider(create: (_) => FontSizeProvider()),
     ],
     child: const MyApp(),
   ));
